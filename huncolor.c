@@ -200,7 +200,14 @@ int main(int argc, char **argv)
 		local_dictionary(hunhandle, buf);
 	}
 
-	if (fork()) {
+	pid_t pid = fork();
+	if (pid < 0) {
+		close(fd[0]);
+		close(fd[1]);
+		Hunspell_destroy(hunhandle);
+		exec_less(argv);
+	}
+	if (pid > 0) {
 		dup2(fd[0], 0);
 		close(fd[0]);
 		close(fd[1]);
